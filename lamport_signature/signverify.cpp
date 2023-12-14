@@ -3,6 +3,8 @@
 #include <string>
 #include <bitset>
 
+std::string toBinaryString(const std::string& message);
+
 std::vector<uint8_t> Sign(std::string message, std::vector<uint8_t> sk) {
     std::vector<uint8_t> signature;
 
@@ -24,8 +26,8 @@ std::vector<uint8_t> Sign(std::string message, std::vector<uint8_t> sk) {
     return signature;
 }
 
-bool Verify(std::vector<uint8_t> message, std::vector<uint8_t> sigature, std::vector<uint8_t> pk){
-    return 0;
+bool Verify(std::string message, std::vector<uint8_t> sig, std::vector<uint8_t> pk){
+    return true;
 }
 
 std::string toBinaryString(const std::string& message) {

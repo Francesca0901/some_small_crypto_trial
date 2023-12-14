@@ -25,8 +25,8 @@ std::string generateRandomString(std::size_t length)
 } 
 
 
-bool run(int l, int n, int k) {
-    for (int i = 0; i < l; ++i) {
+bool run(size_t l, size_t n, size_t k) {
+    for (size_t i = 0; i < l; ++i) {
         // 1. Generate keys for each round - finished
         KeyPair keys = KeyGen(n, k);
 

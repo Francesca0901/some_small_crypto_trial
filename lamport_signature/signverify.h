@@ -2,6 +2,7 @@
 #define SIGNVERIFY_H
 
 #include <vector>
+#include <string>
 #include <cstdint>
 
 std::vector<uint8_t> Sign(std::string message, std::vector<uint8_t> sk);

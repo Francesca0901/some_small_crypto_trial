@@ -4,7 +4,10 @@
 #include <bitset>
 #include <openssl/sha.h>
 
-KeyPair KeyGen(size_t n, size_t k){
+std::vector<uint8_t> generateRandomKbits(size_t k) ;
+std::vector<uint8_t> calculateSHA256(const std::vector<uint8_t>& data);
+
+KeyPair KeyGen(std::size_t n, std::size_t k){
     // Private key generation
     // Generate 2n ramdon values with k bits, C++ doesn't seems have built-in function to generate longer than 64 bits
     std::vector<uint8_t> sk;
@@ -46,6 +49,7 @@ std::vector<uint8_t> generateRandomKbits(size_t k) {
 
     return random_bits;
 }
+
 
 // Borrowed from https://stackoverflow.com/questions/2262386/generate-sha256-with-openssl-and-c
 std::vector<uint8_t> calculateSHA256(const std::vector<uint8_t>& data) {
