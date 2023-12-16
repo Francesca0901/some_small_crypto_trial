@@ -6,23 +6,23 @@
 #include "signverify.h"
 
 
-std::string generateRandomString(std::size_t length) 
+std::string generateRandomBinaryString(std::size_t length) 
 { 
     std::random_device rd; 
     std::mt19937 gen(rd()); 
-    std::string chars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); 
-    std::uniform_int_distribution<> dis(0, chars.size() - 1);
+    std::uniform_int_distribution<> dis(0, 1); // Only two possibilities: 0 or 1
 
-    std::string random_string;
-    random_string.reserve(length); // Allocate the space up-front
+    std::string random_binary_string;
+    random_binary_string.reserve(length); // Allocate the space up-front
 
-    for(size_t i = 0; i < length; ++i)
+    for (std::size_t i = 0; i < length; ++i)
     {
-        random_string.push_back(chars[dis(gen)]);
+        // Add either '0' or '1' to the string
+        random_binary_string.push_back(dis(gen) == 0 ? '0' : '1');
     }
- 
-    return random_string;
-} 
+
+    return random_binary_string;
+}
 
 
 bool run(size_t l, size_t n, size_t k) {
@@ -31,7 +31,7 @@ bool run(size_t l, size_t n, size_t k) {
         KeyPair keys = KeyGen(n, k);
 
         // 2. Generate a random message of length n - finished
-        std::string message = generateRandomString(n);
+        std::string message = generateRandomBinaryString(n);
 
         // 3. Sign the message
         std::vector<uint8_t> signature = Sign(message, keys.privateKey);
@@ -54,10 +54,7 @@ bool run(size_t l, size_t n, size_t k) {
 
 int main() {
     // Let's run 10 rounds of signing and verification, make msg length 1000 bits, and security parameter 256
-    // bool verification = run(10, 1000, 256); 
-
-    // Test with l = 3, n = 100 and k = 256, because of lacking of storage
-    bool verification = run(3, 100, 256); 
+    bool verification = run(10, 1000, 256); 
 
     std::cout << "All signatures verified: " << (verification ? "Yes" : "No") << std::endl;
     return 0;

@@ -5,8 +5,8 @@
 #include <string>
 #include <cstdint>
 
-std::vector<uint8_t> Sign(std::string message, std::vector<uint8_t> sk);
+std::vector<uint8_t> Sign(const std::string &message, const std::vector<uint8_t> &sk);
 
-bool Verify(std::string message, std::vector<uint8_t> sig, std::vector<uint8_t> pk);
+bool Verify(const std::string &message, const std::vector<uint8_t> &sig, const std::vector<uint8_t> &pk);
 
 #endif // SIGNVERIFY_H

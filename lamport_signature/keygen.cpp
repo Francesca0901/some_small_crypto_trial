@@ -54,7 +54,7 @@ std::vector<uint8_t> generateRandomKbits(size_t k) {
 // Borrowed from https://stackoverflow.com/questions/2262386/generate-sha256-with-openssl-and-c
 std::vector<uint8_t> calculateSHA256(const std::vector<uint8_t>& data) {
     uint8_t hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
+    SHA256_CTX sha256; 
     SHA256_Init(&sha256);
     SHA256_Update(&sha256, data.data(), data.size());
     SHA256_Final(hash, &sha256);
