@@ -3,6 +3,7 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
+#include <cassert>
 
 // Bit representation: integer 𝑥, a bit-length 𝑙 and outputs an array containing the bit-representation of 𝑥
 std::vector<uint8_t> generate(uint64_t x, size_t l) {
@@ -11,14 +12,14 @@ std::vector<uint8_t> generate(uint64_t x, size_t l) {
         // find the bit length of x
         size_t bit_length = std::log2(x) + 1;
         if (bit_length > l) {
-            std::cout << "Error: l is smaller than x's size" << std::endl;
+            std::cout << "Error: l is smaller than x's size. l = " << l << " while x contains " << bit_length << " bits." << std::endl;
             return {};
         }
     }
 
     std::vector<uint8_t> result(l, 0);
     for(size_t i = 0; i < l; i++) {
-        result[i] = (x >> i) & 0x1;
+        result[l - 1 - i] = (x >> i) & 0x1;
     }
     return result;
 }
@@ -42,9 +43,9 @@ std::vector<int> cal_z(const std::vector<uint8_t> &x, const std::vector<uint8_t>
 
     for (size_t i = 0; i < l; i++) {
         int sum = 0;
-        // Calculate the summation part of the formula
-        for (size_t j = i + 1; j < l; j++) {
-            sum += (1 - (x[j] ^ y[j]));
+        // Calculate the sum
+        for (int j = i - 1; j >= 0; j--) {
+            sum += (x[j] ^ y[j]);
         }
         // Compute z_i using the given formula
         z[i] = 1 + x[i] - y[i] + 3 * sum;
@@ -99,35 +100,90 @@ void timing(int n, size_t l) {
     std::mt19937_64 rng(rd()); // Use the 64-bit Mersenne Twister 19937 generator
     std::uniform_int_distribution<uint64_t> dist(0, std::numeric_limits<uint64_t>::max());
 
+    // Create a bitmask with only lower l bits set to 1
+    uint64_t bitmask = (l >= 64) ? std::numeric_limits<uint64_t>::max() : (1ULL << l) - 1;
+
     for(size_t i = 0; i < n; i++) {
         // generate two 64-bit unsigned integers x and y
-        uint64_t x = dist(rng);
-        uint64_t y = dist(rng);
+        uint64_t x = dist(rng) & bitmask;
+        uint64_t y = dist(rng) & bitmask;
         bool result = compare(x, y, l);
 
         std::cout << "i = " << i 
                   << " -- x = " << x 
                   << " -- y = " << y 
                   << " -- c = " << (result ? "true" : "false") << std::endl;
+        
+        std::cout << std::endl;
     }
 
     return;
 }
 
-void test() {
-    int x = 6;
-    int y = 8;
-    std::cout << (compare(x, y, 4) ? "true" : "false") << std::endl;
-    return;
+
+// --------------------- Tests ---------------------
+void testGenerate() {
+    std::cout << "Testing generate function" << std::endl;
+
+    // Test Case 1
+    assert(generate(0, 4) == (std::vector<uint8_t>{0, 0, 0, 0}));
+    // Test Case 2
+    assert(generate(15, 4) == (std::vector<uint8_t>{1, 1, 1, 1}));
+    // Test Case 3
+    assert(generate(1, 8) == (std::vector<uint8_t>{0, 0, 0, 0, 0, 0, 0, 1}));
+    // Test Case 4: Can't be asserted as it returns an error or empty vector
+
+    std::cout << "generate function passed all tests." << std::endl;
 }
+
+void testPermute() {
+    std::cout << "Testing permute function" << std::endl;
+
+    // a basic test to check size.
+    // Test Case 1
+    assert(permute({1, 2, 3, 4, 5}).size() == 5);
+    // Test Case 2
+    assert(permute({}).empty());
+
+    std::cout << "permute function passed basic tests." << std::endl;
+}
+
+void testFinalize() {
+    std::cout << "Testing finalize function" << std::endl;
+
+    // Test Case 1
+    assert(finalize({0, 1, 2}, 3) == true);
+    // Test Case 2
+    assert(finalize({1, 2, 3}, 3) == false);
+
+    std::cout << "finalize function passed all tests." << std::endl;
+}
+
+void testCompare() {
+    std::cout << "Testing compare function" << std::endl;
+
+    assert(compare(2, 3, 64) == true); 
+    assert(compare(100000, 100000, 64) == false); 
+    assert(compare(987654321, 123456789, 64) == false); 
+    assert(compare(123456789, 987654321, 64) == true); 
+    assert(compare(123456789, 234567890, 64) == true); 
+
+    std::cout << "compare function passed basic tests." << std::endl;
+}
+
+// --------------------- Main ---------------------
 
 int main() {
     srand(time(NULL));
 
-    // test();
+    // Run the tests
+    // testGenerate();
+    // testPermute();
+    // testFinalize();
+    // testCompare();
 
-    // Test 10 times, let length be 64 bits
-    timing(10, 64);
+    // Test 10 times, let length be 50 bits
+    timing(10, 50);
 
     return 0;
 }
