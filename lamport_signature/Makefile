@@ -6,7 +6,7 @@ OBJS = keygen.o signverify.o lamportscheme.o
 
 HEADERS = keygen.h signverify.h
 
-EXEC = lamportscheme
+EXEC = lamport
 
 all: $(EXEC)
 
