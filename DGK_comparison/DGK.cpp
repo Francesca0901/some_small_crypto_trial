@@ -2,8 +2,9 @@
 #include <vector>
 #include <cmath>
 #include <random>
-#include <algorithm>
 #include <cassert>
+#include <ctime>
+#include <cstdlib>
 
 // Bit representation: integer 𝑥, a bit-length 𝑙 and outputs an array containing the bit-representation of 𝑥
 std::vector<uint8_t> generate(uint64_t x, size_t l) {
@@ -24,22 +25,36 @@ std::vector<uint8_t> generate(uint64_t x, size_t l) {
     return result;
 }
 
-// Takes an array and returns a random permutation of that array
+// A utility function to swap to integers 
+void swap (int *a, int *b) 
+{ 
+    int temp = *a; 
+    *a = *b; 
+    *b = temp; 
+} 
+
+// Fisher–Yates shuffle, O(n) time complexity
 std::vector<int> permute(const std::vector<int> &z) {
     std::vector<int> permuted(z.begin(), z.end());
     
-    auto rd = std::random_device {}; 
-    auto rng = std::default_random_engine { rd() };
+   // Initialize random seed
+    std::srand(time(NULL));
 
-    // Shuffle the vector
-    std::shuffle(std::begin(permuted), std::end(permuted), rng);
+    for (std::size_t i = permuted.size() - 1; i > 0; i--) 
+    { 
+        // Pick a random index from 0 to i 
+        std::size_t j = rand() % (i + 1); 
+ 
+        // Swap arr[i] with the element at random index 
+        swap(&permuted[i], &permuted[j]); 
+    } 
 
     return permuted;
 }
 
-// Compute vector z
+// Compute vector z, O(l^2) time complexity
 std::vector<int> cal_z(const std::vector<uint8_t> &x, const std::vector<uint8_t> &y, size_t l) {
-    std::vector<int> z(l, 0); // int or not?
+    std::vector<int> z(l, 0); 
 
     for (size_t i = 0; i < l; i++) {
         int sum = 0;
@@ -104,7 +119,7 @@ void timing(int n, size_t l) {
     uint64_t bitmask = (l >= 64) ? std::numeric_limits<uint64_t>::max() : (1ULL << l) - 1;
 
     for(size_t i = 0; i < n; i++) {
-        // generate two 64-bit unsigned integers x and y
+        // generate two 64-bit unsigned integers x and y, and cut them into l bits
         uint64_t x = dist(rng) & bitmask;
         uint64_t y = dist(rng) & bitmask;
         bool result = compare(x, y, l);
@@ -113,8 +128,6 @@ void timing(int n, size_t l) {
                   << " -- x = " << x 
                   << " -- y = " << y 
                   << " -- c = " << (result ? "true" : "false") << std::endl;
-        
-        std::cout << std::endl;
     }
 
     return;
@@ -125,13 +138,9 @@ void timing(int n, size_t l) {
 void testGenerate() {
     std::cout << "Testing generate function" << std::endl;
 
-    // Test Case 1
     assert(generate(0, 4) == (std::vector<uint8_t>{0, 0, 0, 0}));
-    // Test Case 2
     assert(generate(15, 4) == (std::vector<uint8_t>{1, 1, 1, 1}));
-    // Test Case 3
     assert(generate(1, 8) == (std::vector<uint8_t>{0, 0, 0, 0, 0, 0, 0, 1}));
-    // Test Case 4: Can't be asserted as it returns an error or empty vector
 
     std::cout << "generate function passed all tests." << std::endl;
 }
@@ -140,9 +149,7 @@ void testPermute() {
     std::cout << "Testing permute function" << std::endl;
 
     // a basic test to check size.
-    // Test Case 1
     assert(permute({1, 2, 3, 4, 5}).size() == 5);
-    // Test Case 2
     assert(permute({}).empty());
 
     std::cout << "permute function passed basic tests." << std::endl;
@@ -151,9 +158,7 @@ void testPermute() {
 void testFinalize() {
     std::cout << "Testing finalize function" << std::endl;
 
-    // Test Case 1
     assert(finalize({0, 1, 2}, 3) == true);
-    // Test Case 2
     assert(finalize({1, 2, 3}, 3) == false);
 
     std::cout << "finalize function passed all tests." << std::endl;
@@ -182,7 +187,7 @@ int main() {
     // testFinalize();
     // testCompare();
 
-    // Test 10 times, let length be 50 bits
+    // Test 10 times, let length 50 bits
     timing(10, 50);
 
     return 0;

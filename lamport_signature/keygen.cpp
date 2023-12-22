@@ -7,9 +7,11 @@
 std::vector<uint8_t> generateRandomKbits(size_t k) ;
 std::vector<uint8_t> calculateSHA256(const std::vector<uint8_t>& data);
 
+// The way to store the key: bit0_0, bit1_0, bit2_0, ..., bitn_0,
+//                           bit0_1, bit1)1, bit2_1, ..., bitn_1
 KeyPair KeyGen(std::size_t n, std::size_t k){
     // Private key generation
-    // Generate 2n ramdon values with k bits, C++ doesn't seems have built-in function to generate longer than 64 bits
+    // Generate 2n ramdon values with k bits each
     std::vector<uint8_t> sk;
     for(size_t i = 0; i < n * 2; i++) {
         std::vector<uint8_t> randomBits = generateRandomKbits(k);
@@ -29,22 +31,18 @@ KeyPair KeyGen(std::size_t n, std::size_t k){
 }
 
 std::vector<uint8_t> generateRandomKbits(size_t k) {
-    // K can be expected to be divided by 64
-    size_t num_blocks = k / 64; 
-    size_t num_bytes = num_blocks * 8; // 8 bytes per block
+    // K can be expected to be a multiple of 8
+    size_t num_bytes = k / 8; // 8 bytes per block
 
     std::vector<uint8_t> random_bits(num_bytes, 0);
 
     // Random number generation
     std::random_device rd;
-    std::mt19937_64 gen(rd()); // Use mt19937_64 for generating 64-bit random numbers
-    std::uniform_int_distribution<uint64_t> dis;
+    std::mt19937_64 gen(rd()); 
+    std::uniform_int_distribution<uint8_t> dis;
 
-    for(size_t i = 0; i < num_blocks; i++) {
-        uint64_t random_block = dis(gen);
-        for(size_t j = 0; j < 8; j++) {
-            random_bits[i * 8 + j] = (random_block >> (j * 8)) & 0xFF;
-        }
+    for (size_t i = 0; i < num_bytes; ++i) {
+        random_bits[i] = dis(gen);  // Directly assign a random byte
     }
 
     return random_bits;

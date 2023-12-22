@@ -13,7 +13,7 @@ std::string generateRandomBinaryString(std::size_t length)
     std::uniform_int_distribution<> dis(0, 1); // Only two possibilities: 0 or 1
 
     std::string random_binary_string;
-    random_binary_string.reserve(length); // Allocate the space up-front
+    random_binary_string.reserve(length); // Allocate the space in advance
 
     for (std::size_t i = 0; i < length; ++i)
     {
@@ -59,3 +59,19 @@ int main() {
     std::cout << "All signatures verified: " << (verification ? "Yes" : "No") << std::endl;
     return 0;
 }
+
+
+// an example to explain
+
+// Keygen: n = 2, k = 4
+// sk = bit0: {0:A, 1:B} 
+//      bit1: {0:C, 1:D} 
+// pk = bit0: {H(A), H(B)} = {0:E, 1:F}
+//      bit1: {H(C), H(D)} = {0:G, 1:H}
+
+// Sign: m = 01
+// sig = {A, D}
+
+// Verify: m = 01, sig = {A, D}, pk = {E, F, G, H}
+// verify = {E, H}
+// H(A) == E, H(D) == H, pass
